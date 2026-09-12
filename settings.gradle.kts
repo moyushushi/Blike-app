@@ -33,5 +33,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FristApp"
+rootProject.name = "BlikeAndroid"
 include(":app")
