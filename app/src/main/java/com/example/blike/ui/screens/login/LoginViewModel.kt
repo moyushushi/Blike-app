@@ -50,7 +50,13 @@ class LoginViewModel : ViewModel() {
                 )
                 val data = res.effectiveData
                 if (res.effectiveStatus == 200 && data != null) {
-                    ServiceLocator.tokenManager.saveToken(data.token)
+                    ServiceLocator.tokenManager.saveLogin(
+                        token = data.token,
+                        userId = data.user.id,
+                        username = data.user.username,
+                        email = data.user.email,
+                        avatar = data.user.avatar
+                    )
                     _state.update { it.copy(loading = false, success = true) }
                 } else {
                     _state.update {

@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.example.blike.ui.screens.article.ArticleListScreen
+import com.example.blike.ui.screens.profile.ProfileScreen
 import com.example.blike.ui.screens.video.VideoListScreen
 
 private data class BottomTab(
@@ -75,7 +76,7 @@ fun MainScreen(navController: NavHostController) {
                 0 -> VideoListScreen(navController)
                 1 -> ArticleListScreen(navController)
                 2 -> PlaceholderTab("待开发")
-                3 -> PlaceholderTab("我的")
+                3 -> ProfileScreen(navController)
             }
         }
     }
