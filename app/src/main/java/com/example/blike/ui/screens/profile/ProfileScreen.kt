@@ -1,5 +1,6 @@
 package com.example.blike.ui.screens.profile
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -52,6 +53,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.blike.data.remote.ApiConfig
+import com.example.blike.di.ServiceLocator
 import com.example.blike.ui.navigation.Routes
 
 private val Pink = Color(0xFFFB7299)
@@ -64,7 +66,6 @@ fun ProfileScreen(
 ) {
     val state by vm.state.collectAsState()
     val snackbar = remember { SnackbarHostState() }
-
     // 上传头像的对话框（这里只做示意：让用户输入一个本地路径或跳过）
     var showChangePwdDialog by remember { mutableStateOf(false) }
 
