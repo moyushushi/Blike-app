@@ -33,7 +33,7 @@ fun LoginScreen(
     LaunchedEffect(state.success) {
         if (state.success) {
             vm.consumeSuccess()
-            navController.navigate(Routes.VIDEO_LIST) {
+            navController.navigate(Routes.MAIN) {
                 popUpTo(Routes.LOGIN) { inclusive = true }
             }
         }

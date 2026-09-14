@@ -61,6 +61,9 @@ dependencies {
 
     // 图片加载
     implementation("io.coil-kt:coil-compose:2.7.0")
-
     debugImplementation("androidx.compose.ui:ui-tooling")
+
+    // Media3 ExoPlayer
+    implementation("androidx.media3:media3-exoplayer:1.5.1")
+    implementation("androidx.media3:media3-ui:1.5.1")
 }

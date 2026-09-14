@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://10.201.186.178:8080/"
+
 
     fun create(tokenManager: TokenManager): ApiService{
         val logging = HttpLoggingInterceptor().apply {
@@ -25,11 +25,11 @@ object RetrofitClient {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(ApiConfig.BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create()
+            .create(ApiService::class.java)
     }
 
 

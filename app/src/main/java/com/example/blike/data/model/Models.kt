@@ -45,6 +45,37 @@ data class Video(
     val cover: String? = null,
     val author: String? = null,
     val avatar: String? = null,
-    val playCount: String? = null,
+    val playCount: Long? = null,
     val time: String? = null
+)
+
+data class VideoDetail(
+    val id: Long,
+    val userId: Long = 0,
+    val title: String,
+    val url: String,
+    val cover: String? = null,
+    val author: String? = null,
+    val avatar: String? = null,
+    val playCount: Long? = null,
+    val time: String? = null,
+    val desc: String? = null,
+    val publishTime: String? = null,
+    val likeCount: Long? = null,
+    val commentCount: Long? = null
+)
+
+data class VideoComment(
+    val id: Long,
+    val videoId: Long = 0,
+    val userId: Long = 0,
+    val content: String,
+    val createTime: String? = null,
+    val username: String? = null,
+    val avatar: String? = null
+)
+
+data class CommentRequest(
+    val videoId: Long,
+    val content: String
 )
