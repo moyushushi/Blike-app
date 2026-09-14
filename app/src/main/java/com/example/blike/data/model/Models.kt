@@ -20,6 +20,8 @@ data class RestBean<T>(
         get() = msg ?: (message as? String)
 }
 
+// ==================== 认证 ====================
+
 data class LoginRequest(
     val username: String,
     val password: String,
@@ -31,13 +33,26 @@ data class LoginData(
     val user: User
 )
 
+// ==================== 用户 ====================
+
 data class User(
     val id: Long,
     val username: String,
-    val email: String,
+    val email: String? = null,   // /user/info、/user/following 不返回 email
     val avatar: String? = null,
     val bio: String? = null
 )
+
+data class UpdateBioRequest(
+    val bio: String
+)
+
+data class ChangePasswordRequest(
+    val oldPassword: String,
+    val newPassword: String
+)
+
+// ==================== 视频 ====================
 
 data class Video(
     val id: Long,
@@ -46,7 +61,9 @@ data class Video(
     val author: String? = null,
     val avatar: String? = null,
     val playCount: Long? = null,
-    val time: String? = null
+    val time: String? = null,
+    val publishTime: String? = null,   // /video/user/{userId} 返回
+    val likeTime: String? = null       // /user/liked-videos 返回
 )
 
 data class VideoDetail(
@@ -77,5 +94,40 @@ data class VideoComment(
 
 data class CommentRequest(
     val videoId: Long,
+    val content: String
+)
+
+// ==================== 文章 ====================
+
+data class Article(
+    val id: Long,
+    val title: String,
+    val content: String? = null,   // 列表接口不返回 content，必须可空
+    val cover: String? = null,
+    val category: String? = null,
+    val viewCount: Long? = null,
+    val likeCount: Long? = null,
+    val commentCount: Long? = null,
+    val publishTime: String? = null,
+    val userId: Long = 0,
+    val status: Int? = null,
+    val author: String? = null,
+    val avatar: String? = null,
+    val likeTime: String? = null    // /article/liked 返回
+)
+
+data class ArticleComment(
+    val id: Long,
+    val articleId: Long = 0,
+    val userId: Long = 0,
+    val content: String,
+    val likeCount: Long? = null,
+    val createTime: String? = null,
+    val username: String? = null,
+    val avatar: String? = null
+)
+
+data class ArticleCommentRequest(
+    val articleId: Long,
     val content: String
 )

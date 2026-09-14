@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Build
@@ -23,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import com.example.blike.ui.screens.article.ArticleListScreen
 import com.example.blike.ui.screens.video.VideoListScreen
 
 private data class BottomTab(
@@ -32,7 +34,7 @@ private data class BottomTab(
 
 private val tabs = listOf(
     BottomTab("视频", Icons.Default.VideoLibrary),
-    BottomTab("图文", Icons.Default.Article),
+    BottomTab("图文", Icons.AutoMirrored.Filled.Article),
     BottomTab("待开发", Icons.Default.Build),
     BottomTab("我的", Icons.Default.AccountCircle)
 )
@@ -71,7 +73,7 @@ fun MainScreen(navController: NavHostController) {
         ) {
             when (selectedTab) {
                 0 -> VideoListScreen(navController)
-                1 -> PlaceholderTab("图文")
+                1 -> ArticleListScreen(navController)
                 2 -> PlaceholderTab("待开发")
                 3 -> PlaceholderTab("我的")
             }
