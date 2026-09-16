@@ -9,7 +9,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,42 +32,58 @@ import com.example.blike.data.model.Video
 import com.example.blike.data.remote.ApiConfig
 import com.example.blike.ui.navigation.Routes
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoListScreen(
     navController: NavHostController,
+    refreshKey: Int = 0,
     vm: VideoListViewModel = viewModel()
 ) {
     val state by vm.state.collectAsState()
 
-    when {
-        state.loading -> Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
+    // refreshKey 变化时重新加载
+    LaunchedEffect(refreshKey) {
+        if (refreshKey > 0) vm.load()
+    }
 
-        state.error != null -> Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(state.error!!)
-        }
+    val pullState = rememberPullToRefreshState()
 
-        else -> LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(state.videos) { video ->
-                VideoCard(
-                    video = video,
-                    onClick = {
-                        navController.navigate(Routes.videoDetail(video.id))
-                    }
-                )
+    PullToRefreshBox(
+        isRefreshing = state.loading,
+        onRefresh = { vm.load() },
+        state = pullState,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        when {
+            state.loading && state.videos.isEmpty() -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+
+            state.error != null && state.videos.isEmpty() -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(state.error!!)
+            }
+
+            else -> LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(state.videos) { video ->
+                    VideoCard(
+                        video = video,
+                        onClick = {
+                            navController.navigate(Routes.videoDetail(video.id))
+                        }
+                    )
+                }
             }
         }
     }

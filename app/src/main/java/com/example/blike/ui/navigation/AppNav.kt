@@ -15,8 +15,11 @@ import com.example.blike.di.ServiceLocator
 import com.example.blike.ui.common.PlaceholderScreen
 import com.example.blike.ui.screens.article.ArticleDetailScreen
 import com.example.blike.ui.screens.article.ArticleListScreen
+import com.example.blike.ui.screens.forget.ForgetScreen
 import com.example.blike.ui.screens.login.LoginScreen
 import com.example.blike.ui.screens.main.MainScreen
+import com.example.blike.ui.screens.register.RegisterScreen
+import com.example.blike.ui.screens.upload.UploadScreen
 import com.example.blike.ui.screens.video.VideoDetailScreen
 
 object Routes {
@@ -24,6 +27,8 @@ object Routes {
     const val MAIN = "main"
     const val REGISTER = "register"
     const val FORGET = "forget"
+
+    const val UPLOAD = "upload"
 
     const val VIDEO_DETAIL = "video_detail/{videoId}"
     fun videoDetail(id: Long) = "video_detail/$id"
@@ -75,8 +80,9 @@ fun AppNav() {
     ) {
         composable(Routes.LOGIN) { LoginScreen(nav) }
         composable(Routes.MAIN) { MainScreen(nav) }
-        composable(Routes.REGISTER) { PlaceholderScreen("注册") }
-        composable(Routes.FORGET) { PlaceholderScreen("忘记密码") }
+        composable(Routes.REGISTER) { RegisterScreen(nav)  }
+        composable(Routes.FORGET) { ForgetScreen(nav) }
+        composable(Routes.UPLOAD) { UploadScreen(nav) }
 
         composable(
             route = Routes.VIDEO_DETAIL,

@@ -22,8 +22,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,48 +47,61 @@ import com.example.blike.data.model.Article
 import com.example.blike.data.remote.ApiConfig
 import com.example.blike.ui.navigation.Routes
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleListScreen(
     navController: NavHostController,
+    refreshKey: Int = 0,
     vm: ArticleListViewModel = viewModel()
 ) {
     val state by vm.state.collectAsState()
 
-    when {
-        state.loading -> Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
+    LaunchedEffect(refreshKey) {
+        if (refreshKey > 0) vm.load()
+    }
 
-        state.error != null -> Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(state.error!!)
-        }
+    val pullState = rememberPullToRefreshState()
 
-        else -> LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(state.articles, key = { it.id }) { article ->
-                ArticleCard(
-                    article = article,
-                    onClick = {
-                        navController.navigate(Routes.articleDetail(article.id))
-                    }
-                )
+    PullToRefreshBox(
+        isRefreshing = state.loading,
+        onRefresh = { vm.load() },
+        state = pullState,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        when {
+            state.loading && state.articles.isEmpty() -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+
+            state.error != null && state.articles.isEmpty() -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(state.error!!)
+            }
+
+            else -> LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(state.articles, key = { it.id }) { article ->
+                    ArticleCard(
+                        article = article,
+                        onClick = {
+                            navController.navigate(Routes.articleDetail(article.id))
+                        }
+                    )
+                }
             }
         }
     }
 }
-
 
 @Composable
 private fun ArticleCard(article: Article, onClick: () -> Unit) {

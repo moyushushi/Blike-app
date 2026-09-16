@@ -43,7 +43,7 @@ class TokenManager(context: Context) {
         clear()
     }
 
-    // 用户信息缓存（可选，方便首屏秒显）
+    // 用户信息缓存
 
     var userId: Long
         get() = sp.getLong(KEY_USER_ID, 0L)

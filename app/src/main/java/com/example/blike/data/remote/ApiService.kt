@@ -104,7 +104,7 @@ import retrofit2.http.*
             @Part("title") title: RequestBody,
             @Part("desc") desc: RequestBody?,
             @Part("category") category: RequestBody?
-        ): RestBean<String>
+        ): RestBean<Any>    // ← String 改 Any
 
         @POST("api/video/{id}/play")
         suspend fun addPlayCount(@Path("id") id: Long): RestBean<Unit>

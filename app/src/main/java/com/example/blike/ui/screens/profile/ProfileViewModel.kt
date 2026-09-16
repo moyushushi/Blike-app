@@ -2,6 +2,7 @@ package com.example.blike.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.blike.data.model.ChangePasswordRequest
 import com.example.blike.data.model.UpdateBioRequest
 import com.example.blike.data.model.User
 import com.example.blike.di.ServiceLocator
@@ -28,8 +29,12 @@ data class ProfileUiState(
     // 上传头像
     val uploadingAvatar: Boolean = false,
 
+    val changingPassword: Boolean = false,   // ← 新增
+
     // 退出登录
-    val loggedOut: Boolean = false
+    val loggedOut: Boolean = false,
+
+
 )
 
 
@@ -151,6 +156,46 @@ class ProfileViewModel : ViewModel() {
         // 根据你 TokenManager 的实际方法名改，常见的有 clearToken / clear / removeToken
         ServiceLocator.tokenManager.logout()
         _state.update { it.copy(loggedOut = true) }
+    }
+    // ==================== 修改密码 ====================
+
+    fun changePassword(old: String, new: String, onResult: (Boolean) -> Unit) {
+        if (old.isBlank() || new.isBlank()) {
+            _state.update { it.copy(error = "请输入旧密码和新密码") }
+            onResult(false)
+            return
+        }
+        if (new.length < 6) {
+            _state.update { it.copy(error = "新密码至少 6 位") }
+            onResult(false)
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update { it.copy(changingPassword = true, error = null) }
+            try {
+                val res = ServiceLocator.apiService.changePassword(
+                    ChangePasswordRequest(old, new)
+                )
+                if (res.success) {
+                    _state.update { it.copy(changingPassword = false) }
+                    onResult(true)
+                } else {
+                    _state.update {
+                        it.copy(
+                            changingPassword = false,
+                            error = res.effectiveMessage ?: "修改失败"
+                        )
+                    }
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(changingPassword = false, error = e.message ?: "网络异常")
+                }
+                onResult(false)
+            }
+        }
     }
 
     fun consumeError() = _state.update { it.copy(error = null) }

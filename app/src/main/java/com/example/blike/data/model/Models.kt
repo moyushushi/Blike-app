@@ -5,19 +5,12 @@ import com.google.gson.annotations.SerializedName
 data class RestBean<T>(
     @SerializedName("status") val status: Int,
     @SerializedName("success") val success: Boolean = false,
-    @SerializedName("message") val message: T? = null,
-    @SerializedName("code") val code: Int? = null,
-    @SerializedName("msg") val msg: String? = null,
+    @SerializedName("message") val message: String? = null,
     @SerializedName("data") val data: T? = null
 ) {
-    val effectiveStatus: Int
-        get() = code ?: status
-
-    val effectiveData: T?
-        get() = data ?: message
-
-    val effectiveMessage: String?
-        get() = msg ?: (message as? String)
+    val effectiveStatus: Int get() = status
+    val effectiveData: T? get() = data
+    val effectiveMessage: String? get() = message
 }
 
 // ==================== 认证 ====================

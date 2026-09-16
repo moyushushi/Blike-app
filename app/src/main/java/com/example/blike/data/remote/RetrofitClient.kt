@@ -1,6 +1,5 @@
 package com.example.blike.data.remote
 
-
 import com.example.blike.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -12,26 +11,26 @@ object RetrofitClient {
 
     fun create(tokenManager: TokenManager): ApiService {
 
-        // 只有 debug 包才打详细日志，release 包关掉
+        // 关键：BASIC 只打 method/url/status/耗时，不读 body，上传大文件不会 OOM
         val logging = HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) {
-                HttpLoggingInterceptor.Level.BODY
+                HttpLoggingInterceptor.Level.BASIC
             } else {
                 HttpLoggingInterceptor.Level.NONE
             }
         }
 
         val client = OkHttpClient.Builder()
+            .addInterceptor(logging)
             .addInterceptor(
                 AuthInterceptor(
                     tokenProvider = { tokenManager.token },
                     onUnauthorized = { tokenManager.clear() }
                 )
             )
-            .addInterceptor(logging)
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .readTimeout(300, TimeUnit.SECONDS)
+            .writeTimeout(300, TimeUnit.SECONDS)
             .build()
 
         return Retrofit.Builder()

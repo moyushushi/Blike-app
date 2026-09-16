@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -47,6 +48,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -256,10 +259,15 @@ fun ProfileScreen(
 
     if (showChangePwdDialog) {
         ChangePasswordDialog(
-            onDismiss = { showChangePwdDialog = false },
-            onConfirm = { _, _ ->
-                showChangePwdDialog = false
-                // TODO: 调用 vm.changePassword(old, new)
+            loading = state.changingPassword,
+            onDismiss = { if (!state.changingPassword) showChangePwdDialog = false },
+            onConfirm = { old, new ->
+                vm.changePassword(old, new) { ok ->
+                    if (ok) {
+                        showChangePwdDialog = false
+                        // 通过 snackbar 提示成功（可选）
+                    }
+                }
             }
         )
     }
@@ -304,6 +312,7 @@ private fun MenuItem(title: String, onClick: () -> Unit) {
 
 @Composable
 private fun ChangePasswordDialog(
+    loading: Boolean,
     onDismiss: () -> Unit,
     onConfirm: (old: String, new: String) -> Unit
 ) {
@@ -311,7 +320,7 @@ private fun ChangePasswordDialog(
     var newPwd by remember { mutableStateOf("") }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!loading) onDismiss() },
         title = { Text("修改密码") },
         text = {
             Column {
@@ -320,14 +329,20 @@ private fun ChangePasswordDialog(
                     onValueChange = { oldPwd = it },
                     label = { Text("旧密码") },
                     singleLine = true,
+                    enabled = !loading,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(12.dp))
                 OutlinedTextField(
                     value = newPwd,
                     onValueChange = { newPwd = it },
-                    label = { Text("新密码") },
+                    label = { Text("新密码（至少 6 位）") },
                     singleLine = true,
+                    enabled = !loading,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -335,13 +350,24 @@ private fun ChangePasswordDialog(
         confirmButton = {
             TextButton(
                 onClick = { onConfirm(oldPwd, newPwd) },
-                enabled = oldPwd.isNotBlank() && newPwd.isNotBlank()
+                enabled = !loading && oldPwd.isNotBlank() && newPwd.isNotBlank()
             ) {
-                Text("确定", color = Pink)
+                if (loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = Pink
+                    )
+                } else {
+                    Text("确定", color = Pink)
+                }
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !loading
+            ) {
                 Text("取消", color = Color(0xFF888888))
             }
         }
